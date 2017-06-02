@@ -6,7 +6,6 @@ import bodyparser from 'koa-bodyparser';
 import logger from 'koa-logger';
 import cors from 'koa-cors';
 
-import config from './config';
 import * as spotify from './spotify';
 
 const app = new Koa();
@@ -39,11 +38,11 @@ router.get('/spotify', async (ctx) => {
       };
     }
 
-    const { access_token, refresh_token } = await spotify.authorize(query.code, query.state);
+    const { access, refresh } = await spotify.authorize(query.code, query.state);
 
-    console.log('authorize', access_token, refresh_token);
+    console.log('authorize', access, refresh);
 
-    ctx.response.redirect(`${query.state}?access_token=${access_token}&refresh_token=${refresh_token}`);
+    ctx.response.redirect(`${query.state}?access=${access}&refresh=${refresh}`);
   } catch (err) {
     ctx.body = {
       message: err.message,
@@ -65,11 +64,11 @@ router.post('/spotify/refresh', async (ctx) => {
       };
     }
 
-    const { access_token, refresh_token } = await spotify.refresh(token);
+    const { access, refresh } = await spotify.refresh(token);
 
     ctx.body = {
-      access_token,
-      refresh_token,
+      access,
+      refresh,
     };
   } catch (err) {
     ctx.body = {
